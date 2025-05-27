@@ -18,14 +18,16 @@ Este é um projeto básico de API RESTful em Go que realiza operações de **Cre
 ```
 📦meu-crud-golang
  ┣ 📂banco
- ┃ ┗ 📄conexao.go
- ┣ 📂models
- ┃ ┗ 📄usuario.go
- ┣ 📂handlers
- ┃ ┗ 📄usuarios.go
+ ┃ ┗ 📄banco.go
+ ┣ 📂servidor
+ ┃ ┗ 📄servidor.go
  ┣ 📄main.go
  ┣ 📄.env
+ ┣ 📄go.sum
+ ┣ 📄.gitignore
+ ┣ 📄readme
  ┗ 📄go.mod
+ 
 ```
 
 ---
