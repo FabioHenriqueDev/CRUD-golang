@@ -137,12 +137,14 @@ func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Erro ao se conectar com o banco de dados"))
 		return
 	}
+	defer db.Close()
 
 	linha, err := db.Query("SELECT * FROM usuarios WHERE ID = ?", ID)
 	if err != nil{
 		w.Write([]byte("Erro na consulta"))
 		return
 	}
+	defer linha.Close()
 
 	var usuario usuario
 	if linha.Next(){
