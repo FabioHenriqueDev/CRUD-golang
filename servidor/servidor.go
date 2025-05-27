@@ -115,7 +115,6 @@ func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Traz um usuario especifico de um banco de dados
 func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 	err := godotenv.Load()
@@ -158,4 +157,53 @@ func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Erro ao converer struct em json"))
 		return
 	}
+}
+
+
+func AtualizarUsuario(w http.ResponseWriter, r *http.Request){
+	err := godotenv.Load()
+	if err != nil{
+		w.Write([]byte("Erro ao carregar arquivo .env"))
+		return
+	}
+
+	parametro := mux.Vars(r)
+
+	ID, err := strconv.ParseUint(parametro["id"], 10, 32)
+	if err != nil{
+		w.Write([]byte("Erro ao converter ID em um inteiro"))
+		return
+	}
+
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+	if err != nil{
+		w.Write([]byte("Erro ao ler o corpo da requisição"))
+		return
+	}
+	var usuario usuario
+
+	if err = json.Unmarshal(corpoRequisicao, &usuario); err != nil{
+		w.Write([]byte("Erro ao converter dados em struct"))
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		w.Write([]byte("Erro ao se conectar com o banco de dados"))
+		return
+	}
+	defer db.Close() 
+
+	statement, err := db.Prepare("UPDATE usuarios SET nome = ?, email = ? WHERE id = ?")
+	if err != nil{
+		w.Write([]byte("Erro na query"))
+		return
+	}
+	defer statement.Close()
+
+	if _, err := statement.Exec(usuario.Nome, usuario.Email, ID); err != nil{
+		w.Write([]byte("Erro ao atualizar usuario"))
+	}
+	
+
 }
