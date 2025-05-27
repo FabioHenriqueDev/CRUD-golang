@@ -159,7 +159,7 @@ func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
+// Atualiza um usuario no banco de dados
 func AtualizarUsuario(w http.ResponseWriter, r *http.Request){
 	err := godotenv.Load()
 	if err != nil{
@@ -204,6 +204,44 @@ func AtualizarUsuario(w http.ResponseWriter, r *http.Request){
 	if _, err := statement.Exec(usuario.Nome, usuario.Email, ID); err != nil{
 		w.Write([]byte("Erro ao atualizar usuario"))
 	}
-	
 
+
+}
+
+// Deleta um Usuario no banco de dados
+func DeletarUsuario(w http.ResponseWriter, r *http.Request){
+	err := godotenv.Load()
+	if err != nil{
+		w.Write([]byte("Erro ao carregar arquivo .env"))
+		return
+	}
+
+	parametro := mux.Vars(r)
+
+	ID, err := strconv.ParseUint(parametro["id"], 10, 32)
+	if err != nil{
+		w.Write([]byte("Erro ao converter o ID em int"))
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil{
+		w.Write([]byte("Erro ao se conectar com o banco de dados"))
+		return
+	}
+	defer db.Close()
+
+	statement, err := db.Prepare("DELETE FROM usuarios WHERE id = ?")
+	if err != nil {
+		w.Write([]byte("Erro na consulta"))
+		return
+	}
+	defer statement.Close()
+
+	if _, err := statement.Exec(ID); err != nil {
+		w.Write([]byte("Erro ao deletar usuário"))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
